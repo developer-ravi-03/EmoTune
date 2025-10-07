@@ -1,0 +1,121 @@
+# ==============================
+#  Node / Frontend (React + Vite + Tailwind)
+# ==============================
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite cache
+.vite/
+
+# Editor folders
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# ==============================
+#  Python / Flask / Backend
+# ==============================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Flask cache / instance
+instance/
+*.db
+*.sqlite3
+
+# Flask logs
+*.log
+
+# Flask settings
+.env
+config.pyc
+
+# ==============================
+#  Machine Learning / Models
+# ==============================
+# Model files (large)
+*.h5
+*.hdf5
+*.keras
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+
+# Dataset files
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+*.zip
+*.tar
+*.gz
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# ==============================
+#  OS / IDE / Misc
+# ==============================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VSCode / JetBrains
+.vscode/
+.idea/
+*.code-workspace
+
+# ==============================
+#  Production / Deployment
+# ==============================
+# Python build
+build/
+dist/
+*.egg-info/
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# Temporary / Cache
+__cache__/
+.cache/
+temp/
+tmp/
