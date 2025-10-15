@@ -20,7 +20,7 @@ MODEL_PATH = os.path.join(BASE_DIR, 'ml', 'models', 'emotion_detection_model_fin
 model = None
 
 # Emotion labels (adjust based on your model)
-EMOTION_LABELS = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+EMOTION_LABELS = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise', ]
 
 def load_model():
     """Load the emotion detection model"""

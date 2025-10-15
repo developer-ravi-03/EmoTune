@@ -1,181 +1,119 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Mail, Lock, LogIn, Music, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { Mail, Lock, Music, AlertCircle } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
+    setLoading(true);
 
-    const result = await login(email, password);
-
-    if (result.success) {
-      navigate("/dashboard");
-    } else {
-      setError(result.error);
+    try {
+      await login(email, password);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-dark-900 relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500/20 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-500/20 rounded-full blur-3xl animate-pulse-slow" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md relative z-10"
-      >
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="inline-flex items-center justify-center bg-gradient-to-r from-primary-500 to-accent-500 p-4 rounded-2xl mb-4"
-          >
-            <Music className="w-10 h-10 text-white" />
-          </motion.div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800 px-4 transition-colors duration-300">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-3 rounded-full">
+              <Music className="w-12 h-12 text-white" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
             Welcome Back
-          </h1>
-          <p className="text-gray-400">
-            Login to continue your musical journey
+          </h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Sign in to continue to EmoTune
           </p>
         </div>
 
-        {/* Login Form */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
-          className="card"
-        >
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
+
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
+                  id="email"
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input-field pl-11"
+                  className="pl-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                   placeholder="you@example.com"
-                  required
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  type="password"
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-field pl-11 pr-11"
+                  className="pl-10 w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
                   placeholder="••••••••"
-                  required
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-300"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
               </div>
             </div>
-
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-red-400 text-sm"
-              >
-                {error}
-              </motion.div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-primary w-full"
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Logging in...</span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <LogIn className="w-5 h-5" />
-                  <span>Login</span>
-                </div>
-              )}
-            </button>
-          </form>
-
-          {/* Register Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="text-primary-400 hover:text-primary-300 font-semibold transition-colors"
-              >
-                Create one
-              </Link>
-            </p>
           </div>
-        </motion.div>
 
-        {/* Back to Home */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-center mt-6"
-        >
-          <Link
-            to="/"
-            className="text-gray-400 hover:text-white transition-colors text-sm"
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            ← Back to Home
-          </Link>
-        </motion.div>
-      </motion.div>
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-purple-600 hover:text-purple-500"
+            >
+              Sign up
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

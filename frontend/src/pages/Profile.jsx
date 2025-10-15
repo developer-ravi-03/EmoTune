@@ -1,337 +1,330 @@
-// import { useState, useEffect } from 'react';
-// import { motion } from 'framer-motion';
-// import { User, Mail, Calendar, Edit, Lock, Loader2, Save, X } from 'lucide-react';
-// import { useAuth } from '../context/AuthContext';
-// import { profileAPI } from '../services/api';
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import axios from "../utils/axios";
+import { API_ENDPOINTS } from "../config/api";
+import {
+  User,
+  Mail,
+  Calendar,
+  Music,
+  Heart,
+  TrendingUp,
+  Lock,
+  Loader,
+  Save,
+} from "lucide-react";
 
-// const Profile = () => {
-//   const { user } = useAuth();
-//   const [profile, setProfile] = useState(null);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [isChangingPassword, setIsChangingPassword] = useState(false);
-//   const [name, setName] = useState('');
-//   const [currentPassword, setCurrentPassword] = useState('');
-//   const [newPassword, setNewPassword] = useState('');
-//   const [confirmPassword, setConfirmPassword] = useState('');
-//   const [error, setError] = useState('');
-//   const [success, setSuccess] = useState('');
+const Profile = () => {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-//   useEffect(() => {
-//     loadProfile();
-//   }, []);
+  // Edit states
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState("");
 
-//   const loadProfile = async () => {
-//     try {
-//       const response = await profileAPI.getProfile();
-//       setProfile(response.data);
-//       setName(response.data.user.name);
-//     } catch (error) {
-//       console.error('Failed to load profile:', error);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
+  // Password change states
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-//   const handleUpdateProfile = async (e) => {
-//     e.preventDefault();
-//     setError('');
-//     setSuccess('');
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
-//     try {
-//       await profileAPI.updateProfile({ name });
-//       setSuccess('Profile updated successfully!');
-//       setIsEditing(false);
-//       loadProfile();
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.error || 'Failed to update profile');
-//     }
-//   };
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(API_ENDPOINTS.PROFILE);
+      setProfile(response.data.user);
+      setStats(response.data.statistics);
+      setName(response.data.user.name);
+    } catch (err) {
+      setError("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//   const handleChangePassword = async (e) => {
-//     e.preventDefault();
-//     setError('');
-//     setSuccess('');
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    setError("");
+    setSuccess("");
 
-//     if (newPassword !== confirmPassword) {
-//       setError('Passwords do not match');
-//       return;
-//     }
+    try {
+      await axios.put(API_ENDPOINTS.UPDATE_PROFILE, { name });
+      setSuccess("Profile updated successfully");
+      setIsEditing(false);
+      fetchProfile();
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to update profile");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-//     if (newPassword.length < 6) {
-//       setError('Password must be at least 6 characters');
-//       return;
-//     }
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
 
-//     try {
-//       await profileAPI.changePassword({
-//         current_password: currentPassword,
-//         new_password: newPassword,
-//       });
-//       setSuccess('Password changed successfully!');
-//       setIsChangingPassword(false);
-//       setCurrentPassword('');
-//       setNewPassword('');
-//       setConfirmPassword('');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.error || 'Failed to change password');
-//     }
-//   };
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-//   if (isLoading) {
-//     return (
-//       <div className="min-h-screen flex items-center justify-center">
-//         <Loader2 className="w-12 h-12 text-primary-400 animate-spin" />
-//       </div>
-//     );
-//   }
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
 
-//   return (
-//     <div className="min-h-screen bg-dark-900 py-8 px-4">
-//       <div className="max-w-4xl mx-auto">
-//         {/* Header */}
-//         <motion.div
-//           initial={{ opacity: 0, y: -20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           className="mb-8"
-//         >
-//           <h1 className="text-4xl font-bold gradient-text mb-2">Profile Settings</h1>
-//           <p className="text-gray-400">Manage your account information</p>
-//         </motion.div>
+    setUpdating(true);
+    setError("");
+    setSuccess("");
 
-//         {/* Success/Error Messages */}
-//         {(error || success) && (
-//           <motion.div
-//             initial={{ opacity: 0, y: -10 }}
-//             animate={{ opacity: 1, y: 0 }}
-//             className="mb-6"
-//           >
-//             {error && (
-//               <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 text-red-400">
-//                 {error}
-//               </div>
-//             )}
-//             {success && (
-//               <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 text-green-400">
-//                 {success}
-//               </div>
-//             )}
-//           </motion.div>
-//         )}
+    try {
+      await axios.post(API_ENDPOINTS.CHANGE_PASSWORD, {
+        current_password: currentPassword,
+        new_password: newPassword,
+      });
+      setSuccess("Password changed successfully");
+      setShowPasswordChange(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to change password");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-//         {/* Profile Info Card */}
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           className="card mb-6"
-//         >
-//           <div className="flex items-center justify-between mb-6">
-//             <h2 className="text-2xl font-bold text-white">Personal Information</h2>
-//             {!isEditing && (
-//               <button
-//                 onClick={() => setIsEditing(true)}
-//                 className="flex items-center gap-2 px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors"
-//               >
-//                 <Edit className="w-4 h-4" />
-//                 Edit
-//               </button>
-//             )}
-//           </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
+        <Loader className="w-12 h-12 animate-spin text-purple-600" />
+      </div>
+    );
+  }
 
-//           {isEditing ? (
-//             <form onSubmit={handleUpdateProfile} className="space-y-4">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-300 mb-2">
-//                   Confirm New Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   value={confirmPassword}
-//                   onChange={(e) => setConfirmPassword(e.target.value)}
-//                   className="input-field"
-//                   required
-//                 />
-//               </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
+          My Profile
+        </h1>
 
-//               <div className="flex gap-4">
-//                 <button type="submit" className="btn-primary flex items-center gap-2">
-//                   <Save className="w-4 h-4" />
-//                   Update Password
-//                 </button>
-//                 <button
-//                   type="button"
-//                   onClick={() => {
-//                     setIsChangingPassword(false);
-//                     setCurrentPassword('');
-//                     setNewPassword('');
-//                     setConfirmPassword('');
-//                     setError('');
-//                   }}
-//                   className="btn-secondary flex items-center gap-2"
-//                 >
-//                   <X className="w-4 h-4" />
-//                   Cancel
-//                 </button>
-//               </div>
-//             </form>
-//           ) : (
-//             <p className="text-gray-400">
-//               Click the "Change" button to update your password
-//             </p>
-//           )}
-//         </motion.div>
-//       </div>
-//     </div>
-//   );
-// };
+        {error && (
+          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+          </div>
+        )}
 
-// export default Profile;-medium text-gray-300 mb-2">
-//                   Full Name
-//                 </label>
-//                 <input
-//                   type="text"
-//                   value={name}
-//                   onChange={(e) => setName(e.target.value)}
-//                   className="input-field"
-//                   required
-//                 />
-//               </div>
+        {success && (
+          <div className="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <p className="text-green-600 dark:text-green-400">{success}</p>
+          </div>
+        )}
 
-//               <div className="flex gap-4">
-//                 <button type="submit" className="btn-primary flex items-center gap-2">
-//                   <Save className="w-4 h-4" />
-//                   Save Changes
-//                 </button>
-//                 <button
-//                   type="button"
-//                   onClick={() => {
-//                     setIsEditing(false);
-//                     setName(profile.user.name);
-//                   }}
-//                   className="btn-secondary flex items-center gap-2"
-//                 >
-//                   <X className="w-4 h-4" />
-//                   Cancel
-//                 </button>
-//               </div>
-//             </form>
-//           ) : (
-//             <div className="space-y-4">
-//               <div className="flex items-center gap-4">
-//                 <div className="bg-primary-500/20 p-3 rounded-lg">
-//                   <User className="w-6 h-6 text-primary-400" />
-//                 </div>
-//                 <div>
-//                   <p className="text-sm text-gray-400">Name</p>
-//                   <p className="text-lg font-semibold text-white">{profile?.user?.name}</p>
-//                 </div>
-//               </div>
+        {/* Profile Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8">
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                <User className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="text-2xl font-bold px-3 py-1 border-2 border-purple-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                ) : (
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {profile?.name}
+                  </h2>
+                )}
+                <p className="text-gray-600 dark:text-gray-400 flex items-center space-x-2 mt-1">
+                  <Mail className="w-4 h-4" />
+                  <span>{profile?.email}</span>
+                </p>
+              </div>
+            </div>
 
-//               <div className="flex items-center gap-4">
-//                 <div className="bg-accent-500/20 p-3 rounded-lg">
-//                   <Mail className="w-6 h-6 text-accent-400" />
-//                 </div>
-//                 <div>
-//                   <p className="text-sm text-gray-400">Email</p>
-//                   <p className="text-lg font-semibold text-white">{profile?.user?.email}</p>
-//                 </div>
-//               </div>
+            {isEditing ? (
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleUpdateProfile}
+                  disabled={updating}
+                  className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Save</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setName(profile?.name);
+                  }}
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+              >
+                Edit Profile
+              </button>
+            )}
+          </div>
 
-//               <div className="flex items-center gap-4">
-//                 <div className="bg-green-500/20 p-3 rounded-lg">
-//                   <Calendar className="w-6 h-6 text-green-400" />
-//                 </div>
-//                 <div>
-//                   <p className="text-sm text-gray-400">Member Since</p>
-//                   <p className="text-lg font-semibold text-white">
-//                     {new Date(profile?.user?.created_at).toLocaleDateString()}
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-//         </motion.div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Member Since
+                </p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {profile?.created_at
+                    ? new Date(profile.created_at).toLocaleDateString()
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-//         {/* Statistics Card */}
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ delay: 0.1 }}
-//           className="card mb-6"
-//         >
-//           <h2 className="text-2xl font-bold text-white mb-6">Your Statistics</h2>
-//           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-//             <div className="text-center">
-//               <p className="text-3xl font-bold text-primary-400 mb-2">
-//                 {profile?.statistics?.total_emotions_detected || 0}
-//               </p>
-//               <p className="text-gray-400">Emotions Detected</p>
-//             </div>
-//             <div className="text-center">
-//               <p className="text-3xl font-bold text-accent-400 mb-2">
-//                 {profile?.statistics?.total_music_recommendations || 0}
-//               </p>
-//               <p className="text-gray-400">Songs Recommended</p>
-//             </div>
-//             <div className="text-center">
-//               <p className="text-2xl font-bold text-green-400 mb-2 capitalize">
-//                 {profile?.statistics?.most_detected_emotion || 'N/A'}
-//               </p>
-//               <p className="text-gray-400">Most Detected</p>
-//             </div>
-//           </div>
-//         </motion.div>
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <Heart className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Emotions Detected
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats?.total_emotions_detected || 0}
+                </p>
+              </div>
+            </div>
+          </div>
 
-//         {/* Change Password Card */}
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ delay: 0.2 }}
-//           className="card"
-//         >
-//           <div className="flex items-center justify-between mb-6">
-//             <h2 className="text-2xl font-bold text-white">Change Password</h2>
-//             {!isChangingPassword && (
-//               <button
-//                 onClick={() => setIsChangingPassword(true)}
-//                 className="flex items-center gap-2 px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30 transition-colors"
-//               >
-//                 <Lock className="w-4 h-4" />
-//                 Change
-//               </button>
-//             )}
-//           </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+                <Music className="w-6 h-6 text-pink-600 dark:text-pink-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Songs Recommended
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {stats?.total_music_recommendations || 0}
+                </p>
+              </div>
+            </div>
+          </div>
 
-//           {isChangingPassword ? (
-//             <form onSubmit={handleChangePassword} className="space-y-4">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-300 mb-2">
-//                   Current Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   value={currentPassword}
-//                   onChange={(e) => setCurrentPassword(e.target.value)}
-//                   className="input-field"
-//                   required
-//                 />
-//               </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Most Detected
+                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
+                  {stats?.most_detected_emotion || "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-300 mb-2">
-//                   New Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   value={newPassword}
-//                   onChange={(e) => setNewPassword(e.target.value)}
-//                   className="input-field"
-//                   required
-//                   minLength={6}
-//                 />
-//               </div>
+        {/* Password Change */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Change Password
+              </h3>
+            </div>
+            <button
+              onClick={() => setShowPasswordChange(!showPasswordChange)}
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              {showPasswordChange ? "Cancel" : "Change"}
+            </button>
+          </div>
 
-//               <div>
-//                 <label className="block text-sm font
+          {showPasswordChange && (
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={updating}
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all disabled:opacity-50"
+              >
+                {updating ? "Changing Password..." : "Change Password"}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
