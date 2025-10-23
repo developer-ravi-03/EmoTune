@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   Video,
   CheckCircle2,
+  X,
 } from "lucide-react";
 import axios from "../utils/axios";
 import { API_ENDPOINTS } from "../config/api";
@@ -24,6 +25,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [detectionSuccess, setDetectionSuccess] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const emotionResultRef = useRef(null);
@@ -113,6 +115,10 @@ const Home = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+
     setDetecting(true);
     setError("");
     setDetectionSuccess(false);
@@ -168,8 +174,12 @@ const Home = () => {
   useEffect(() => {
     return () => {
       stopCamera();
+      // Cleanup preview URL
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
     };
-  }, []);
+  }, [imagePreview]);
 
   const emotionColors = {
     happy: "from-yellow-400 to-orange-500",
@@ -309,30 +319,64 @@ const Home = () => {
               </h2>
             </div>
 
-            <div
-              className="relative border-3 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-16 text-center hover:border-purple-500 dark:hover:border-purple-400 transition-all cursor-pointer bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-900 dark:to-purple-900/20 hover:shadow-xl group"
-              onClick={() => document.getElementById("fileInput").click()}
-            >
-              <Upload className="w-20 h-20 mx-auto mb-4 text-gray-400 group-hover:text-purple-500 transition-colors group-hover:scale-110 transform duration-300" />
-              <p className="text-gray-700 dark:text-gray-300 mb-2 font-semibold text-lg">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                PNG, JPG, GIF up to 10MB
-              </p>
-              <input
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              {detecting && (
-                <div className="absolute inset-0 bg-white/90 dark:bg-gray-800/90 flex items-center justify-center rounded-2xl">
-                  <Loader className="w-12 h-12 animate-spin text-purple-600" />
-                </div>
-              )}
-            </div>
+            {!imagePreview ? (
+              <div
+                className="relative border-3 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-16 text-center hover:border-purple-500 dark:hover:border-purple-400 transition-all cursor-pointer bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-900 dark:to-purple-900/20 hover:shadow-xl group"
+                onClick={() => document.getElementById("fileInput").click()}
+              >
+                <Upload className="w-20 h-20 mx-auto mb-4 text-gray-400 group-hover:text-purple-500 transition-colors group-hover:scale-110 transform duration-300" />
+                <p className="text-gray-700 dark:text-gray-300 mb-2 font-semibold text-lg">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  PNG, JPG, GIF up to 10MB
+                </p>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                {detecting && (
+                  <div className="absolute inset-0 bg-white/90 dark:bg-gray-800/90 flex items-center justify-center rounded-2xl">
+                    <Loader className="w-12 h-12 animate-spin text-purple-600" />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-auto max-h-96 object-contain rounded-2xl border-3 border-gray-300 dark:border-gray-600"
+                />
+                <button
+                  onClick={() => {
+                    URL.revokeObjectURL(imagePreview);
+                    setImagePreview(null);
+                    setEmotion(null);
+                    setConfidence(null);
+                    document.getElementById("fileInput").value = "";
+                  }}
+                  className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-colors shadow-lg hover:scale-110 transform duration-200"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                {detecting && (
+                  <div className="absolute inset-0 bg-white/90 dark:bg-gray-800/90 flex items-center justify-center rounded-2xl">
+                    <Loader className="w-12 h-12 animate-spin text-purple-600" />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Emotion Result with animation */}
             {emotion && (
