@@ -22,6 +22,7 @@ const Home = () => {
   const [emotion, setEmotion] = useState(null);
   const [confidence, setConfidence] = useState(null);
   const [tracks, setTracks] = useState([]);
+  const [historyId, setHistoryId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [detectionSuccess, setDetectionSuccess] = useState(false);
@@ -30,6 +31,10 @@ const Home = () => {
   const streamRef = useRef(null);
   const emotionResultRef = useRef(null);
   const musicSectionRef = useRef(null);
+  const [preferredLanguage, setPreferredLanguage] = useState(
+    localStorage.getItem("preferred_language") || "en"
+  );
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
   const startCamera = async () => {
     try {
@@ -91,14 +96,13 @@ const Home = () => {
           setEmotion(response.data.emotion);
           setConfidence(response.data.confidence);
           setDetectionSuccess(true);
+          setHistoryId(response.data.history_id || null);
 
           // Scroll to emotion result
           setTimeout(() => scrollToElement(emotionResultRef), 300);
 
-          await fetchMusicRecommendations(
-            response.data.emotion,
-            response.data.history_id
-          );
+          // Show language selector before fetching recommendations
+          setShowLanguageSelector(true);
         } catch (err) {
           setError(err.response?.data?.error || "Failed to detect emotion");
         } finally {
@@ -134,14 +138,13 @@ const Home = () => {
       setEmotion(response.data.emotion);
       setConfidence(response.data.confidence);
       setDetectionSuccess(true);
+      setHistoryId(response.data.history_id || null);
 
       // Scroll to emotion result
       setTimeout(() => scrollToElement(emotionResultRef), 300);
 
-      await fetchMusicRecommendations(
-        response.data.emotion,
-        response.data.history_id
-      );
+      // Show language selector before fetching recommendations
+      setShowLanguageSelector(true);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to detect emotion");
     } finally {
@@ -149,16 +152,34 @@ const Home = () => {
     }
   };
 
-  const fetchMusicRecommendations = async (emotionValue, historyId) => {
+  const fetchMusicRecommendations = async (
+    emotionValue,
+    historyId,
+    language = preferredLanguage
+  ) => {
     setLoading(true);
     try {
       const response = await axios.post(API_ENDPOINTS.RECOMMEND_MUSIC, {
         emotion: emotionValue,
         emotion_history_id: historyId,
         limit: 20,
+        language,
       });
 
-      setTracks(response.data.tracks);
+      setTracks(response.data.tracks || []);
+
+      // persist last results so navigation doesn't clear them
+      try {
+        localStorage.setItem(
+          "last_tracks",
+          JSON.stringify(response.data.tracks || [])
+        );
+        localStorage.setItem("last_emotion", emotionValue || "");
+        if (historyId) localStorage.setItem("last_history_id", historyId);
+        localStorage.setItem("preferred_language", language);
+      } catch (e) {
+        console.warn("localStorage set error:", e);
+      }
 
       // Scroll to music section after tracks are loaded
       setTimeout(() => scrollToElement(musicSectionRef), 800);
@@ -170,6 +191,30 @@ const Home = () => {
       setLoading(false);
     }
   };
+
+  // Load persisted state on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("last_tracks");
+      const savedEmotion = localStorage.getItem("last_emotion");
+      const savedHistory = localStorage.getItem("last_history_id");
+      const savedLang = localStorage.getItem("preferred_language");
+      if (saved) setTracks(JSON.parse(saved));
+      if (savedEmotion) setEmotion(savedEmotion);
+      if (savedHistory) setHistoryId(savedHistory);
+      if (savedLang) setPreferredLanguage(savedLang);
+    } catch (e) {
+      console.warn("localStorage parse error:", e);
+    }
+  }, []);
+
+  // keep preferredLanguage in localStorage when changed
+  useEffect(() => {
+    try {
+      if (preferredLanguage)
+        localStorage.setItem("preferred_language", preferredLanguage);
+    } catch (e) {}
+  }, [preferredLanguage]);
 
   useEffect(() => {
     return () => {
@@ -407,6 +452,59 @@ const Home = () => {
                     </div>
                     <p className="text-white/80 text-sm">confidence</p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Language selector shown after detection and before recommending */}
+            {showLanguageSelector && detectionSuccess && (
+              <div className="mt-6 p-6 bg-white/80 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md">
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">
+                  Choose language for recommendations
+                </h4>
+                <div className="flex items-center space-x-3">
+                  <select
+                    value={preferredLanguage}
+                    onChange={(e) => setPreferredLanguage(e.target.value)}
+                    className="px-4 py-2 rounded-lg border bg-white dark:bg-gray-100 border-gray-200 dark:border-gray-700"
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                  </select>
+
+                  <button
+                    onClick={async () => {
+                      setShowLanguageSelector(false);
+                      await fetchMusicRecommendations(
+                        emotion,
+                        historyId,
+                        preferredLanguage
+                      );
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow hover:opacity-95"
+                  >
+                    Confirm
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setShowLanguageSelector(false);
+                      // fetch with default or current preferredLanguage
+                      await fetchMusicRecommendations(
+                        emotion,
+                        historyId,
+                        preferredLanguage
+                      );
+                    }}
+                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow"
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             )}
