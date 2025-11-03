@@ -33,6 +33,23 @@ const Navbar = () => {
 
           {/* Navigation Links and Controls */}
           <div className="flex items-center space-x-2 md:space-x-4">
+            {/* If user not signed in, show Login/Register buttons */}
+            {!user && (
+              <>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 rounded-lg text-white/90 hover:bg-white/10 hover:text-white transition-all"
+                >
+                  Register
+                </Link>
+              </>
+            )}
             {/* Home Button - Only show when logged in */}
             {user && (
               <Link

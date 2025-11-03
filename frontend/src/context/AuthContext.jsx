@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { API_ENDPOINTS } from "../config/api";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AuthContext = createContext(null);
 
@@ -25,36 +27,68 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(API_ENDPOINTS.VERIFY);
       setUser(response.data.user);
     } catch (error) {
+      // token invalid or expired - clear local session
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      // show a non-intrusive info toast
+      // do not force redirect here; Auth consumers may decide
+      toast.info("Session expired. Please sign in again.");
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email, password) => {
-    const response = await axios.post(API_ENDPOINTS.LOGIN, { email, password });
-    localStorage.setItem("token", response.data.access_token);
-    setUser(response.data.user);
-    return response.data;
+    try {
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
+        email,
+        password,
+      });
+      localStorage.setItem("token", response.data.access_token);
+      // persist user if provided
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+      setUser(response.data.user);
+      toast.success("Signed in successfully");
+      return response.data;
+    } catch (err) {
+      const msg =
+        err.response?.data?.error || "Login failed. Please try again.";
+      toast.error(msg);
+      throw err;
+    }
   };
 
   const register = async (name, email, password) => {
-    const response = await axios.post(API_ENDPOINTS.REGISTER, {
-      name,
-      email,
-      password,
-    });
-    localStorage.setItem("token", response.data.access_token);
-    setUser(response.data.user);
-    return response.data;
+    try {
+      const response = await axios.post(API_ENDPOINTS.REGISTER, {
+        name,
+        email,
+        password,
+      });
+      localStorage.setItem("token", response.data.access_token);
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+      setUser(response.data.user);
+      toast.success("Account created and signed in");
+      return response.data;
+    } catch (err) {
+      const msg =
+        err.response?.data?.error || "Registration failed. Please try again.";
+      toast.error(msg);
+      throw err;
+    }
   };
 
   const logout = async () => {
     try {
       await axios.post(API_ENDPOINTS.LOGOUT);
+      toast.success("Signed out successfully");
     } catch (error) {
       console.error("Logout error:", error);
+      toast.error("Logout failed — clearing local session");
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
