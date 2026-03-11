@@ -168,19 +168,6 @@ const Home = () => {
 
       setTracks(response.data.tracks || []);
 
-      // persist last results so navigation doesn't clear them
-      try {
-        localStorage.setItem(
-          "last_tracks",
-          JSON.stringify(response.data.tracks || [])
-        );
-        localStorage.setItem("last_emotion", emotionValue || "");
-        if (historyId) localStorage.setItem("last_history_id", historyId);
-        localStorage.setItem("preferred_language", language);
-      } catch (e) {
-        console.warn("localStorage set error:", e);
-      }
-
       // Scroll to music section after tracks are loaded
       setTimeout(() => scrollToElement(musicSectionRef), 800);
     } catch (err) {
@@ -192,16 +179,10 @@ const Home = () => {
     }
   };
 
-  // Load persisted state on mount
+  // Only load preferredLanguage from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("last_tracks");
-      const savedEmotion = localStorage.getItem("last_emotion");
-      const savedHistory = localStorage.getItem("last_history_id");
       const savedLang = localStorage.getItem("preferred_language");
-      if (saved) setTracks(JSON.parse(saved));
-      if (savedEmotion) setEmotion(savedEmotion);
-      if (savedHistory) setHistoryId(savedHistory);
       if (savedLang) setPreferredLanguage(savedLang);
     } catch (e) {
       console.warn("localStorage parse error:", e);
@@ -213,7 +194,9 @@ const Home = () => {
     try {
       if (preferredLanguage)
         localStorage.setItem("preferred_language", preferredLanguage);
-    } catch (e) {}
+    } catch (e) {
+      // Ignore localStorage errors
+    }
   }, [preferredLanguage]);
 
   useEffect(() => {

@@ -37,12 +37,15 @@ with app.app_context():
     init_database()
 
 # Register blueprints with correct paths
-from backend.routes import auth_routes, emotion_routes, music_routes, profile_routes
+
+# Register blueprints with correct paths
+from backend.routes import auth_routes, emotion_routes, music_routes, profile_routes, forgot_password_routes
 
 app.register_blueprint(auth_routes.bp, url_prefix='/api/auth')
 app.register_blueprint(emotion_routes.bp, url_prefix='/api/emotion')
 app.register_blueprint(music_routes.bp, url_prefix='/api/music')
 app.register_blueprint(profile_routes.bp, url_prefix='/api/profile')
+app.register_blueprint(forgot_password_routes.bp, url_prefix='/api')
 
 # ====================
 # CRITICAL: Handle OPTIONS requests (Preflight)

@@ -74,12 +74,20 @@ const Login = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -103,15 +111,20 @@ const Login = () => {
             {loading ? "Signing in..." : "Sign In"}
           </button>
 
-          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-purple-600 hover:text-purple-500"
-            >
-              Sign up
-            </Link>
-          </p>
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
+              {/* <span className="hidden sm:inline text-gray-400">•</span> */}
+              <p>
+                Don’t have an account?{" "}
+                <Link
+                  to="/register"
+                  className="font-medium text-purple-600 hover:text-purple-500 transition-colors duration-200"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </div>
         </form>
       </div>
     </div>
