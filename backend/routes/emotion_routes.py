@@ -22,13 +22,20 @@ def detect_emotion_from_image(image):
             cv2.imwrite(temp_path, image)
 
         result = client.predict(
-            handle_file(temp_path),   # ✅ FIX HERE
+            handle_file(temp_path),
             api_name="/predict"
         )
 
-        # print("HF RESULT:", result)
+        # ✅ FIX HERE
+        if isinstance(result, list):
+            data = result[0]
+        else:
+            data = result
 
-        return result, None, None
+        emotion = data.get("emotion")
+        confidence = data.get("confidence")
+
+        return emotion, confidence, None
 
     except Exception as e:
         return None, None, str(e)
