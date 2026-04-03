@@ -75,7 +75,7 @@ config.pyc
 *.tsv
 *.xlsx
 *.xls
-*.json
+# *.json
 *.zip
 *.tar
 *.gz
