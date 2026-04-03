@@ -12,17 +12,17 @@ app = Flask(__name__)
 # ====================
 # IMPORTANT: CORS Configuration - Fix the preflight issue
 # ====================
-CORS(app, 
-     resources={
-         r"/api/*": {
-             "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type", "Authorization"],
-             "supports_credentials": True,
-             "expose_headers": ["Content-Type", "Authorization"]
-         }
-     })
-
+# CORS(app, 
+#      resources={
+#          r"/api/*": {
+#              "origins": ["http://localhost:5173", "http://127.0.0.1:5173"],
+#              "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#              "allow_headers": ["Content-Type", "Authorization"],
+#              "supports_credentials": True,
+#              "expose_headers": ["Content-Type", "Authorization"]
+#          }
+#      })
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 # JWT Configuration
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this-in-production')
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
@@ -79,4 +79,5 @@ def health_check():
     return jsonify({'status': 'ok', 'message': 'API is running'}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

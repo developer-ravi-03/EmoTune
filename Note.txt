@@ -1,0 +1,12 @@
+1. deploy mysql on railway and fetch it from there
+-> create table and setup env according railway
+
+2. deploy ml model on hugging face
+Your Flask → calls HuggingFace API → returns prediction
+
+-> create account on hugging face 
+-> setup file app.py, requirements.txt, and model for push on hugging face
+-> upload above files correctly on HuggingFace
+-> now Emotion routes update according HF and fix .env
+
+--> Frontend → Flask → gradio_client → HF Model → DB → Response ✅
