@@ -10,3 +10,8 @@ Your Flask → calls HuggingFace API → returns prediction
 -> now Emotion routes update according HF and fix .env
 
 --> Frontend → Flask → gradio_client → HF Model → DB → Response ✅
+
+3. Backend deployed on Render
+-->https://emotune-3z19.onrender.com
+
+4. Frontend deployed on vercel

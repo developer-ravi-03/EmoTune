@@ -214,21 +214,21 @@ const MusicPlayer = ({ tracks }) => {
       ) : null}
 
       {/* Control Bar */}
-      <div
+      {/* <div
         ref={controlsRef}
         className="flex flex-wrap items-center justify-center gap-4 bg-white/40 dark:bg-gray-800/40 rounded-xl p-4 shadow-md sticky bottom-4 backdrop-blur-md"
-      >
-        {/* Previous */}
-        <button
+      > */}
+      {/* Previous */}
+      {/* <button
           onClick={playPrevious}
           className="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
           title="Previous"
         >
           <SkipBack className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-        </button>
+        </button> */}
 
-        {/* Play / Pause */}
-        <button
+      {/* Play / Pause */}
+      {/* <button
           onClick={togglePlayPause}
           disabled={!currentTrack?.preview_url || isLoading}
           className="p-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-transform transform hover:scale-110 disabled:opacity-50"
@@ -241,19 +241,19 @@ const MusicPlayer = ({ tracks }) => {
           ) : (
             <Play className="w-6 h-6" />
           )}
-        </button>
+        </button> */}
 
-        {/* Next */}
-        <button
+      {/* Next */}
+      {/* <button
           onClick={playNext}
           className="p-3 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
           title="Next"
         >
           <SkipForward className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-        </button>
+        </button> */}
 
-        {/* Progress */}
-        {currentTrack?.preview_url && (
+      {/* Progress */}
+      {/* {currentTrack?.preview_url && (
           <div className="flex flex-col items-center w-full max-w-md">
             <input
               type="range"
@@ -269,10 +269,10 @@ const MusicPlayer = ({ tracks }) => {
               <span>{formatTime(duration)}</span>
             </div>
           </div>
-        )}
+        )} */}
 
-        {/* Volume */}
-        <div className="flex items-center space-x-2">
+      {/* Volume */}
+      {/* <div className="flex items-center space-x-2">
           <button
             onClick={toggleMute}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
@@ -295,8 +295,8 @@ const MusicPlayer = ({ tracks }) => {
           <span className="text-xs text-gray-600 dark:text-gray-400 w-8">
             {Math.round(volume * 100)}%
           </span>
-        </div>
-      </div>
+        </div> */}
+      {/* </div> */}
 
       {/* Track List */}
       <div className="max-h-96 overflow-y-auto space-y-2">

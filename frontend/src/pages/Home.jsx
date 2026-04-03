@@ -32,7 +32,7 @@ const Home = () => {
   const emotionResultRef = useRef(null);
   const musicSectionRef = useRef(null);
   const [preferredLanguage, setPreferredLanguage] = useState(
-    localStorage.getItem("preferred_language") || "en"
+    localStorage.getItem("preferred_language") || "en",
   );
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
@@ -155,7 +155,7 @@ const Home = () => {
   const fetchMusicRecommendations = async (
     emotionValue,
     historyId,
-    language = preferredLanguage
+    language = preferredLanguage,
   ) => {
     setLoading(true);
     try {
@@ -172,7 +172,7 @@ const Home = () => {
       setTimeout(() => scrollToElement(musicSectionRef), 800);
     } catch (err) {
       setError(
-        err.response?.data?.error || "Failed to fetch music recommendations"
+        err.response?.data?.error || "Failed to fetch music recommendations",
       );
     } finally {
       setLoading(false);
@@ -430,8 +430,16 @@ const Home = () => {
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-white">
-                      {(confidence * 100).toFixed(1)}%
+                    <div
+                      className={`text-3xl font-bold ${
+                        confidence > 75
+                          ? "text-green-400"
+                          : confidence > 50
+                            ? "text-yellow-400"
+                            : "text-red-400"
+                      }`}
+                    >
+                      {confidence.toFixed(1)}%
                     </div>
                     <p className="text-white/80 text-sm">confidence</p>
                   </div>
@@ -466,7 +474,7 @@ const Home = () => {
                       await fetchMusicRecommendations(
                         emotion,
                         historyId,
-                        preferredLanguage
+                        preferredLanguage,
                       );
                     }}
                     className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow hover:opacity-95"
@@ -481,7 +489,7 @@ const Home = () => {
                       await fetchMusicRecommendations(
                         emotion,
                         historyId,
-                        preferredLanguage
+                        preferredLanguage,
                       );
                     }}
                     className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow"
