@@ -15,3 +15,4 @@ Your Flask → calls HuggingFace API → returns prediction
 -->https://emotune-3z19.onrender.com
 
 4. Frontend deployed on vercel
+-->https://emo-tune-rose.vercel.app/
