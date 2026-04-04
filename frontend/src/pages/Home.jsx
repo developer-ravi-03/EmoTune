@@ -420,18 +420,18 @@ const Home = () => {
                     Detected Emotion
                   </h3>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center space-x-3 min-w-0">
                     <span className="text-5xl">
                       {emotionEmojis[emotion] || "😊"}
                     </span>
-                    <span className="text-4xl font-bold capitalize text-white drop-shadow-lg">
+                    <span className="text-3xl sm:text-4xl font-bold capitalize text-white drop-shadow-lg break-words">
                       {emotion}
                     </span>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <div
-                      className={`text-3xl font-bold ${
+                      className={`text-2xl sm:text-3xl font-bold ${
                         confidence > 75
                           ? "text-green-400"
                           : confidence > 50
@@ -449,15 +449,15 @@ const Home = () => {
 
             {/* Language selector shown after detection and before recommending */}
             {showLanguageSelector && detectionSuccess && (
-              <div className="mt-6 p-4 sm:p-6 bg-white/80 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md">
-                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200 text-lg sm:text-xl leading-snug">
+              <div className="mt-6 p-4 sm:p-6 bg-white/80 dark:bg-slate-900/70 rounded-xl border border-gray-200 dark:border-cyan-500/20 shadow-md dark:shadow-cyan-950/40">
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-slate-100 text-lg sm:text-xl leading-snug">
                   Choose language for recommendations
                 </h4>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <select
                     value={preferredLanguage}
                     onChange={(e) => setPreferredLanguage(e.target.value)}
-                    className="w-full sm:w-auto min-w-0 px-4 py-3 rounded-lg border bg-white dark:bg-gray-100 border-gray-200 dark:border-gray-700"
+                    className="w-full sm:w-auto min-w-0 px-4 py-3 rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-gray-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   >
                     <option value="en">English</option>
                     <option value="hi">Hindi</option>
@@ -492,7 +492,7 @@ const Home = () => {
                         preferredLanguage,
                       );
                     }}
-                    className="w-full sm:w-auto px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow cursor-pointer"
+                    className="w-full sm:w-auto px-4 py-3 bg-gray-200 dark:bg-slate-700/90 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-slate-100 rounded-lg border border-transparent dark:border-slate-500/40 shadow cursor-pointer transition-colors"
                   >
                     Continue
                   </button>
@@ -524,21 +524,21 @@ const Home = () => {
             ref={musicSectionRef}
             className="surface-card rounded-3xl p-6 sm:p-8 animate-slide-up"
           >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <div className="flex items-start sm:items-center space-x-3 min-w-0">
                 <div className="p-3 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl animate-pulse">
                   <Music2 className="w-8 h-8 text-white" />
                 </div>
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <div className="min-w-0">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
                     Your Personalized Playlist
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400 break-words">
                     Based on your {emotion} emotion
                   </p>
                 </div>
               </div>
-              <span className="px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold">
+              <span className="self-start sm:self-auto px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold">
                 {tracks.length} tracks
               </span>
             </div>

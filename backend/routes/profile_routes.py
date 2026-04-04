@@ -5,6 +5,23 @@ from backend.config.database import get_db_connection
 
 bp = Blueprint('profile', __name__)
 
+
+def _verify_user_password(stored_password, provided_password):
+    """Verify password against hashed or legacy plain-text stored values."""
+    if not stored_password or provided_password is None:
+        return False
+
+    # Standard case: hashed passwords created by werkzeug.
+    try:
+        if check_password_hash(stored_password, provided_password):
+            return True
+    except ValueError:
+        # If a legacy plain-text value exists in DB, fall back to exact match.
+        pass
+
+    # Legacy fallback: plain-text password stored in DB.
+    return stored_password == provided_password
+
 @bp.route('/', methods=['GET'])
 @jwt_required()
 def get_profile():
@@ -124,8 +141,14 @@ def change_password():
         if not data or not all(k in data for k in ['current_password', 'new_password']):
             return jsonify({'error': 'Current and new password required'}), 400
         
-        current_password = data['current_password']
-        new_password = data['new_password']
+        current_password = (data['current_password'] or '').strip()
+        new_password = (data['new_password'] or '').strip()
+
+        if not current_password:
+            return jsonify({'error': 'Current password is required'}), 400
+
+        if not new_password:
+            return jsonify({'error': 'New password is required'}), 400
         
         # Validate new password
         if len(new_password) < 6:
@@ -138,10 +161,15 @@ def change_password():
         cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         
-        if not user or not check_password_hash(user['password'], current_password):
+        if not user or not _verify_user_password(user['password'], current_password):
             cursor.close()
             connection.close()
-            return jsonify({'error': 'Current password is incorrect'}), 401
+            return jsonify({'error': 'Current password is incorrect'}), 400
+
+        if _verify_user_password(user['password'], new_password):
+            cursor.close()
+            connection.close()
+            return jsonify({'error': 'New password must be different from current password'}), 400
         
         # Update password
         hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
@@ -273,10 +301,10 @@ def delete_account():
         cursor.execute("SELECT password FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         
-        if not user or not check_password_hash(user['password'], password):
+        if not user or not _verify_user_password(user['password'], password):
             cursor.close()
             connection.close()
-            return jsonify({'error': 'Incorrect password'}), 401
+            return jsonify({'error': 'Incorrect password'}), 400
         
         # Delete user (cascades to related tables)
         cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))

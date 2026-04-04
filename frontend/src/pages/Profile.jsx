@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "../utils/axios";
 import { API_ENDPOINTS } from "../config/api";
+import { toast } from "react-toastify";
 import {
   User,
   Mail,
@@ -37,6 +38,11 @@ const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
 
   useEffect(() => {
     fetchProfile();
@@ -76,13 +82,40 @@ const Profile = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
 
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+    const trimmedCurrent = currentPassword.trim();
+    const trimmedNew = newPassword.trim();
+    const trimmedConfirm = confirmPassword.trim();
+
+    const nextErrors = {
+      current: "",
+      new: "",
+      confirm: "",
+    };
+
+    if (!trimmedCurrent) {
+      nextErrors.current = "Current password is required";
     }
 
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (!trimmedNew) {
+      nextErrors.new = "New password is required";
+    } else if (trimmedNew.length < 6) {
+      nextErrors.new = "Password must be at least 6 characters";
+    }
+
+    if (!trimmedConfirm) {
+      nextErrors.confirm = "Confirm password is required";
+    } else if (trimmedNew !== trimmedConfirm) {
+      nextErrors.confirm = "Passwords do not match";
+    }
+
+    if (trimmedCurrent && trimmedNew && trimmedCurrent === trimmedNew) {
+      nextErrors.new = "New password must be different from current password";
+    }
+
+    setPasswordErrors(nextErrors);
+
+    if (nextErrors.current || nextErrors.new || nextErrors.confirm) {
+      toast.error(nextErrors.current || nextErrors.new || nextErrors.confirm);
       return;
     }
 
@@ -90,10 +123,12 @@ const Profile = () => {
     setError("");
     setSuccess("");
 
+    const toastId = toast.loading("Changing password...");
+
     try {
       await axios.post(API_ENDPOINTS.CHANGE_PASSWORD, {
-        current_password: currentPassword,
-        new_password: newPassword,
+        current_password: trimmedCurrent,
+        new_password: trimmedNew,
       });
       setSuccess("Password changed successfully");
       setShowPasswordChange(false);
@@ -103,8 +138,33 @@ const Profile = () => {
       setShowCurrentPassword(false);
       setShowNewPassword(false);
       setShowConfirmPassword(false);
+      setPasswordErrors({ current: "", new: "", confirm: "" });
+      toast.update(toastId, {
+        render: "Password changed successfully",
+        type: "success",
+        isLoading: false,
+        autoClose: 2500,
+        closeOnClick: true,
+      });
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to change password");
+      const backendError =
+        err.response?.data?.error || "Failed to change password";
+      setError(backendError);
+
+      if (backendError.toLowerCase().includes("current password")) {
+        setPasswordErrors((prev) => ({
+          ...prev,
+          current: "Current password is incorrect",
+        }));
+      }
+
+      toast.update(toastId, {
+        render: backendError,
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        closeOnClick: true,
+      });
     } finally {
       setUpdating(false);
     }
@@ -289,9 +349,16 @@ const Profile = () => {
                   <input
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    onChange={(e) => {
+                      setCurrentPassword(e.target.value);
+                      setPasswordErrors((prev) => ({ ...prev, current: "" }));
+                    }}
                     required
-                    className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                    className={`w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 dark:bg-gray-700 dark:text-white ${
+                      passwordErrors.current
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-600 focus:ring-purple-600"
+                    }`}
                   />
                   <button
                     type="button"
@@ -310,6 +377,11 @@ const Profile = () => {
                     )}
                   </button>
                 </div>
+                {passwordErrors.current && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {passwordErrors.current}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -320,9 +392,16 @@ const Profile = () => {
                   <input
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      setPasswordErrors((prev) => ({ ...prev, new: "" }));
+                    }}
                     required
-                    className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                    className={`w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 dark:bg-gray-700 dark:text-white ${
+                      passwordErrors.new
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-600 focus:ring-purple-600"
+                    }`}
                   />
                   <button
                     type="button"
@@ -341,6 +420,11 @@ const Profile = () => {
                     )}
                   </button>
                 </div>
+                {passwordErrors.new && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {passwordErrors.new}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -351,9 +435,16 @@ const Profile = () => {
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setPasswordErrors((prev) => ({ ...prev, confirm: "" }));
+                    }}
                     required
-                    className="w-full px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:text-white"
+                    className={`w-full px-4 py-2 pr-10 border rounded-lg focus:ring-2 dark:bg-gray-700 dark:text-white ${
+                      passwordErrors.confirm
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-600 focus:ring-purple-600"
+                    }`}
                   />
                   <button
                     type="button"
@@ -372,6 +463,11 @@ const Profile = () => {
                     )}
                   </button>
                 </div>
+                {passwordErrors.confirm && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {passwordErrors.confirm}
+                  </p>
+                )}
               </div>
 
               <button
