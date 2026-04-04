@@ -18,7 +18,12 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+          <div className="app-shell min-h-screen transition-colors duration-300">
+            <div className="app-ambient" aria-hidden="true">
+              <div className="ambient-orb a"></div>
+              <div className="ambient-orb b"></div>
+              <div className="ambient-orb c"></div>
+            </div>
             <Navbar />
             <ToastContainer
               position="top-right"

@@ -124,7 +124,7 @@ const MusicPlayer = ({ tracks }) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.4 }}
-          className="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/40 dark:to-pink-900/40 rounded-xl p-6 shadow-lg"
+          className="surface-card bg-gradient-to-r from-cyan-100/50 to-blue-100/50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl p-6"
         >
           <div className="flex items-center space-x-4">
             {currentTrack?.image_url ? (
@@ -168,7 +168,7 @@ const MusicPlayer = ({ tracks }) => {
                 href={currentTrack.spotify_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span className="hidden sm:inline">Spotify</span>
@@ -193,7 +193,7 @@ const MusicPlayer = ({ tracks }) => {
         <>
           <button
             onClick={() => setShowSpotifyEmbed(!showSpotifyEmbed)}
-            className="w-full mb-4 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+            className="w-full mb-4 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 cursor-pointer"
           >
             <Music className="w-5 h-5" />
             <span>{showSpotifyEmbed ? "Hide" : "Show"} Spotify Player</span>
@@ -299,15 +299,15 @@ const MusicPlayer = ({ tracks }) => {
       {/* </div> */}
 
       {/* Track List */}
-      <div className="max-h-96 overflow-y-auto space-y-2">
+      <div className="max-h-96 overflow-y-auto space-y-2 pr-1">
         {tracks.map((track, i) => (
           <div
             key={track.id || i}
             onClick={() => setCurrentTrackIndex(i)}
-            className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all ${
+            className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-300 ${
               i === currentTrackIndex
-                ? "bg-purple-100 dark:bg-purple-900/30 ring-2 ring-purple-500"
-                : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                ? "bg-cyan-100 dark:bg-cyan-900/30 ring-2 ring-cyan-500"
+                : "hover:bg-gray-100/80 dark:hover:bg-gray-700/80 hover:translate-x-1"
             }`}
           >
             {track.image_url ? (

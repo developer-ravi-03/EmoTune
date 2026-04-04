@@ -230,8 +230,8 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900 transition-all duration-500">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen transition-all duration-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header with animation */}
         <div className="text-center mb-1 animate-fadeIn">
           <div className="flex justify-center mb-4">
@@ -240,7 +240,7 @@ const Home = () => {
               <div className="absolute inset-0 blur-xl bg-purple-400/50 animate-pulse"></div>
             </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 animate-gradient bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent bg-300% animate-gradient-x">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 animate-gradient bg-gradient-to-r from-cyan-600 via-blue-600 to-teal-500 bg-clip-text text-transparent bg-300% animate-gradient-x">
             Emotion Detection & Music
           </h1>
           <p className="text-gray-700 dark:text-gray-300 text-lg max-w-2xl mx-auto">
@@ -261,9 +261,9 @@ const Home = () => {
         {/* Detection Methods Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Camera Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 transform hover:scale-[1.02] transition-all duration-300 border border-purple-100 dark:border-purple-900/50">
+          <div className="surface-card rounded-3xl p-6 sm:p-8 transform hover:scale-[1.01] transition-all duration-300">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl">
+              <div className="p-3 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl">
                 <Video className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -300,7 +300,7 @@ const Home = () => {
               {!cameraActive ? (
                 <button
                   onClick={startCamera}
-                  className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold"
+                  className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl transition-all transform hover:scale-105 shadow-lg hover:shadow-xl font-semibold cursor-pointer"
                 >
                   <Camera className="w-5 h-5" />
                   <span>Start Camera</span>
@@ -309,7 +309,7 @@ const Home = () => {
                 <>
                   <button
                     onClick={stopCamera}
-                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all transform hover:scale-105 shadow-lg font-semibold"
+                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl transition-all transform hover:scale-105 shadow-lg font-semibold cursor-pointer"
                   >
                     <StopCircle className="w-5 h-5" />
                     <span>Stop</span>
@@ -317,7 +317,7 @@ const Home = () => {
                   <button
                     onClick={captureAndDetect}
                     disabled={detecting}
-                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg font-semibold"
+                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg font-semibold cursor-pointer"
                   >
                     {detecting ? (
                       <>
@@ -337,9 +337,9 @@ const Home = () => {
           </div>
 
           {/* Upload Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 transform hover:scale-[1.02] transition-all duration-300 border border-pink-100 dark:border-pink-900/50">
+          <div className="surface-card rounded-3xl p-6 sm:p-8 transform hover:scale-[1.01] transition-all duration-300">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-3 bg-gradient-to-br from-pink-500 to-purple-500 rounded-xl">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl">
                 <ImageIcon className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -349,7 +349,7 @@ const Home = () => {
 
             {!imagePreview ? (
               <div
-                className="relative border-3 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-16 text-center hover:border-purple-500 dark:hover:border-purple-400 transition-all cursor-pointer bg-gradient-to-br from-gray-50 to-purple-50 dark:from-gray-900 dark:to-purple-900/20 hover:shadow-xl group"
+                className="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-10 sm:p-16 text-center hover:border-cyan-500 dark:hover:border-cyan-400 transition-all cursor-pointer bg-gradient-to-br from-gray-50 to-cyan-50 dark:from-gray-900 dark:to-slate-900 hover:shadow-xl group"
                 onClick={() => document.getElementById("fileInput").click()}
               >
                 <Upload className="w-20 h-20 mx-auto mb-4 text-gray-400 group-hover:text-purple-500 transition-colors group-hover:scale-110 transform duration-300" />
@@ -377,7 +377,7 @@ const Home = () => {
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-auto max-h-96 object-contain rounded-2xl border-3 border-gray-300 dark:border-gray-600"
+                  className="w-full h-auto max-h-96 object-contain rounded-2xl border-2 border-gray-300 dark:border-gray-600"
                 />
                 <button
                   onClick={() => {
@@ -387,7 +387,7 @@ const Home = () => {
                     setConfidence(null);
                     document.getElementById("fileInput").value = "";
                   }}
-                  className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-colors shadow-lg hover:scale-110 transform duration-200"
+                  className="absolute top-4 right-4 p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-colors shadow-lg hover:scale-110 transform duration-200 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -449,15 +449,15 @@ const Home = () => {
 
             {/* Language selector shown after detection and before recommending */}
             {showLanguageSelector && detectionSuccess && (
-              <div className="mt-6 p-6 bg-white/80 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md">
-                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">
+              <div className="mt-6 p-4 sm:p-6 bg-white/80 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 shadow-md">
+                <h4 className="font-semibold mb-3 text-gray-800 dark:text-gray-200 text-lg sm:text-xl leading-snug">
                   Choose language for recommendations
                 </h4>
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   <select
                     value={preferredLanguage}
                     onChange={(e) => setPreferredLanguage(e.target.value)}
-                    className="px-4 py-2 rounded-lg border bg-white dark:bg-gray-100 border-gray-200 dark:border-gray-700"
+                    className="w-full sm:w-auto min-w-0 px-4 py-3 rounded-lg border bg-white dark:bg-gray-100 border-gray-200 dark:border-gray-700"
                   >
                     <option value="en">English</option>
                     <option value="hi">Hindi</option>
@@ -477,7 +477,7 @@ const Home = () => {
                         preferredLanguage,
                       );
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg shadow hover:opacity-95"
+                    className="w-full sm:w-auto px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg shadow hover:opacity-95 cursor-pointer"
                   >
                     Confirm
                   </button>
@@ -492,7 +492,7 @@ const Home = () => {
                         preferredLanguage,
                       );
                     }}
-                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow"
+                    className="w-full sm:w-auto px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg shadow cursor-pointer"
                   >
                     Continue
                   </button>
@@ -522,11 +522,11 @@ const Home = () => {
         {tracks.length > 0 && !loading && (
           <div
             ref={musicSectionRef}
-            className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 animate-slide-up border border-purple-100 dark:border-purple-900/50"
+            className="surface-card rounded-3xl p-6 sm:p-8 animate-slide-up"
           >
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center space-x-3">
-                <div className="p-3 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl animate-pulse">
+                <div className="p-3 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl animate-pulse">
                   <Music2 className="w-8 h-8 text-white" />
                 </div>
                 <div>

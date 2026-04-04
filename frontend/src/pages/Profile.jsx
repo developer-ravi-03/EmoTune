@@ -104,16 +104,16 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader className="w-12 h-12 animate-spin text-purple-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen transition-colors duration-300">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-8">
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-8 animate-fadeIn">
           My Profile
         </h1>
 
@@ -130,38 +130,38 @@ const Profile = () => {
         )}
 
         {/* Profile Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+        <div className="surface-card rounded-2xl p-4 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div className="w-20 h-20 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/30 flex-shrink-0">
                 <User className="w-10 h-10 text-white" />
               </div>
-              <div>
+              <div className="min-w-0">
                 {isEditing ? (
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="text-2xl font-bold px-3 py-1 border-2 border-purple-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="text-xl sm:text-2xl font-bold px-3 py-1 border-2 border-cyan-600 rounded-lg dark:bg-gray-700 dark:text-white w-full"
                   />
                 ) : (
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white break-words">
                     {profile?.name}
                   </h2>
                 )}
-                <p className="text-gray-600 dark:text-gray-400 flex items-center space-x-2 mt-1">
-                  <Mail className="w-4 h-4" />
-                  <span>{profile?.email}</span>
+                <p className="text-gray-600 dark:text-gray-400 flex items-center space-x-2 mt-1 text-sm sm:text-base overflow-hidden">
+                  <Mail className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{profile?.email}</span>
                 </p>
               </div>
             </div>
 
             {isEditing ? (
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:space-x-2">
                 <button
                   onClick={handleUpdateProfile}
                   disabled={updating}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors disabled:opacity-50 w-full sm:w-auto cursor-pointer"
                 >
                   <Save className="w-4 h-4" />
                   <span>Save</span>
@@ -171,7 +171,7 @@ const Profile = () => {
                     setIsEditing(false);
                     setName(profile?.name);
                   }}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 rounded-lg transition-colors"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 rounded-lg transition-colors w-full sm:w-auto cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -179,7 +179,7 @@ const Profile = () => {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg transition-colors w-full sm:w-auto cursor-pointer"
               >
                 Edit Profile
               </button>
@@ -205,9 +205,9 @@ const Profile = () => {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div className="surface-card rounded-xl p-6">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <div className="p-3 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg">
                 <Heart className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
@@ -221,9 +221,9 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div className="surface-card rounded-xl p-6">
             <div className="flex items-center space-x-3">
-              <div className="p-3 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <Music className="w-6 h-6 text-pink-600 dark:text-pink-400" />
               </div>
               <div>
@@ -237,7 +237,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div className="surface-card rounded-xl p-6">
             <div className="flex items-center space-x-3">
               <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                 <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -255,17 +255,17 @@ const Profile = () => {
         </div>
 
         {/* Password Change */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="surface-card rounded-2xl p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
             <div className="flex items-center space-x-3">
               <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 Change Password
               </h3>
             </div>
             <button
               onClick={() => setShowPasswordChange(!showPasswordChange)}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-colors w-full sm:w-auto cursor-pointer"
             >
               {showPasswordChange ? "Cancel" : "Change"}
             </button>
@@ -315,7 +315,7 @@ const Profile = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-lg transition-all disabled:opacity-50 cursor-pointer"
               >
                 {updating ? "Changing Password..." : "Change Password"}
               </button>

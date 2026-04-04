@@ -22,7 +22,23 @@ app = Flask(__name__)
 #              "expose_headers": ["Content-Type", "Authorization"]
 #          }
 #      })
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+
+CORS(app,
+     resources={
+         r"/api/*": {
+             "origins": [
+                 "https://emo-tune-rose.vercel.app",
+                 "http://localhost:5173",
+                 "http://127.0.0.1:5173"
+             ],
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+             "allow_headers": ["Content-Type", "Authorization"],
+             "supports_credentials": True
+         }
+     })
+
+
 # JWT Configuration
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-this-in-production')
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
@@ -50,16 +66,16 @@ app.register_blueprint(forgot_password_routes.bp, url_prefix='/api')
 # ====================
 # CRITICAL: Handle OPTIONS requests (Preflight)
 # ====================
-@app.before_request
-def handle_preflight():
-    from flask import request
-    if request.method == "OPTIONS":
-        response = app.make_default_options_response()
-        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
-        return response
+# @app.before_request
+# def handle_preflight():
+#     from flask import request
+#     if request.method == "OPTIONS":
+#         response = app.make_default_options_response()
+#         response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+#         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+#         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+#         response.headers['Access-Control-Allow-Credentials'] = 'true'
+#         return response
 
 # Error handlers
 @app.errorhandler(404)

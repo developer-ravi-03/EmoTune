@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://emotune-3z19.onrender.com/api";
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api";
 
 export const API_ENDPOINTS = {
   // Auth
@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
   RECOMMEND_WITH_PREVIEW: `${API_BASE_URL}/music/recommend-with-preview`,
 
   // Profile
-  PROFILE: `${API_BASE_URL}/profile`,
+  PROFILE: `${API_BASE_URL}/profile/`,
   UPDATE_PROFILE: `${API_BASE_URL}/profile/update`,
   CHANGE_PASSWORD: `${API_BASE_URL}/profile/change-password`,
   USER_ACTIVITY: `${API_BASE_URL}/profile/activity`,

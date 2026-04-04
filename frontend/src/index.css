@@ -1,1 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	color-scheme: light;
+	--app-bg: radial-gradient(circle at 14% 12%, #d8ecff 0%, #f4f9ff 34%, #f6f2ff 66%, #fff9f0 100%);
+	--panel-bg: rgba(255, 255, 255, 0.74);
+	--panel-border: rgba(140, 172, 211, 0.2);
+	--panel-shadow: 0 22px 44px rgba(17, 40, 79, 0.12);
+	--text-primary: #0f172a;
+	--text-muted: #475569;
+	--accent: #0ea5e9;
+	--accent-2: #2563eb;
+}
+
+.dark {
+	color-scheme: dark;
+	--app-bg: radial-gradient(circle at 18% 10%, #0f1b35 0%, #0f172a 38%, #1f1144 70%, #090f1f 100%);
+	--panel-bg: rgba(16, 24, 38, 0.72);
+	--panel-border: rgba(104, 146, 197, 0.28);
+	--panel-shadow: 0 26px 48px rgba(0, 0, 0, 0.46);
+	--text-primary: #e2e8f0;
+	--text-muted: #94a3b8;
+	--accent: #22d3ee;
+	--accent-2: #60a5fa;
+}
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: "Manrope", sans-serif;
+	color: var(--text-primary);
+	background: var(--app-bg);
+	text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: "Sora", sans-serif;
+	letter-spacing: -0.015em;
+}

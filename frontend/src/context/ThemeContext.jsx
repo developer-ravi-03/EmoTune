@@ -19,14 +19,10 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     const root = window.document.documentElement;
 
-    // Apply 'dark' class only when theme is dark (Tailwind uses 'dark' class)
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    root.setAttribute("data-theme", theme);
 
-    // Save to localStorage
     localStorage.setItem("theme", theme);
   }, [theme]);
 

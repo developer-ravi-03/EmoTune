@@ -4,52 +4,118 @@
   padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.app-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-/* Smooth transitions for theme changes */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+.ambient-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(16px);
+  opacity: 0.35;
+  animation: orb-float 10s ease-in-out infinite;
 }
 
-/* Loading spinner */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.ambient-orb.a {
+  width: 380px;
+  height: 380px;
+  left: -110px;
+  top: 8%;
+  background: radial-gradient(circle, #0ea5e9 0%, rgba(14, 165, 233, 0) 70%);
+}
+
+.ambient-orb.b {
+  width: 340px;
+  height: 340px;
+  right: -100px;
+  top: 24%;
+  animation-delay: 2.5s;
+  background: radial-gradient(circle, #60a5fa 0%, rgba(96, 165, 250, 0) 70%);
+}
+
+.ambient-orb.c {
+  width: 360px;
+  height: 360px;
+  left: 50%;
+  bottom: -140px;
+  transform: translateX(-50%);
+  animation-delay: 5s;
+  background: radial-gradient(circle, #0f766e 0%, rgba(15, 118, 110, 0) 72%);
+}
+
+.dark .ambient-orb.a {
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.48) 0%, rgba(34, 211, 238, 0) 70%);
+}
+
+.dark .ambient-orb.b {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.44) 0%, rgba(59, 130, 246, 0) 70%);
+}
+
+.dark .ambient-orb.c {
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.38) 0%, rgba(45, 212, 191, 0) 72%);
+}
+
+.surface-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform-style: preserve-3d;
+  transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+}
+
+.surface-card:hover {
+  transform: translateY(-3px) rotateX(0.6deg);
+}
+
+.auth-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.responsive-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-stack {
+    flex-direction: row;
   }
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
+input,
+select,
+textarea,
+button {
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
 }
 
-/* Fade in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.24);
 }
-
-.fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
 
 @keyframes gradient-x {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 50%;
   }
   50% {
@@ -65,7 +131,6 @@
   background-size: 300% 300%;
 }
 
-/* Bounce in animation */
 @keyframes bounce-in {
   0% {
     opacity: 0;
@@ -87,7 +152,6 @@
   animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Slide up animation */
 @keyframes slide-up {
   from {
     opacity: 0;
@@ -103,15 +167,22 @@
   animation: slide-up 0.6s ease-out;
 }
 
-/* Shake animation for errors */
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-5px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(5px);
   }
 }
@@ -120,7 +191,6 @@
   animation: shake 0.5s;
 }
 
-/* Fade in animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -134,4 +204,25 @@
 
 .animate-fadeIn {
   animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes orb-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -16px, 0) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
