@@ -21,6 +21,9 @@ EMAIL_FROM = os.getenv('EMAIL_FROM', EMAIL_HOST_USER)
 
 OTP_EXPIRY_MINUTES = 10
 
+print("EMAIL_HOST_USER:", EMAIL_HOST_USER)
+print("EMAIL_HOST_PASSWORD:", EMAIL_HOST_PASSWORD)
+print("EMAIL_FROM:", EMAIL_FROM)
 
 def send_otp_email(to_email, otp):
     subject = "Your OTP for Password Reset"
@@ -30,6 +33,7 @@ def send_otp_email(to_email, otp):
     msg['From'] = EMAIL_FROM
     msg['To'] = to_email
 
+    print("Connecting SMTP...")
     with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
         server.starttls()
         server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
