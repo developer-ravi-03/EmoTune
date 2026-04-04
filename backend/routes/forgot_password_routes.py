@@ -40,34 +40,46 @@ def generate_otp(length=6):
     return ''.join(random.choices(string.digits, k=length))
 
 
-@bp.route('/forgot-password', methods=['POST'])
+@bp.route('/forgot-password', methods=['POST', 'OPTIONS'])
 def forgot_password():
-    data = request.get_json()
-    email = data.get('email')
-    if not email:
-        return jsonify({'error': 'Email is required'}), 400
+    from flask import request, jsonify
 
-    # Check if user exists
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('SELECT id FROM users WHERE email = %s', (email,))
-    user = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    if not user:
-        return jsonify({'error': 'You are not registered. Please sign up.'}), 404
+    # ✅ Handle preflight request
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
 
-    otp = generate_otp()
-    otp_store[email] = {
-        'otp': otp,
-        'expires_at': datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
-    }
     try:
-        send_otp_email(email, otp)
-    except Exception as e:
-        return jsonify({'error': f'Failed to send OTP: {str(e)}'}), 500
-    return jsonify({'message': 'OTP sent to email'}), 200
+        data = request.get_json()
 
+        if not data or 'email' not in data:
+            return jsonify({'error': 'Email is required'}), 400
+
+        email = data.get('email')
+
+        # Check if user exists
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT id FROM users WHERE email = %s', (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not user:
+            return jsonify({'error': 'You are not registered. Please sign up.'}), 404
+
+        otp = generate_otp()
+        otp_store[email] = {
+            'otp': otp,
+            'expires_at': datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
+        }
+
+        send_otp_email(email, otp)
+
+        return jsonify({'message': 'OTP sent to email'}), 200
+
+    except Exception as e:
+        print("ERROR:", str(e))
+        return jsonify({'error': 'Internal server error'}), 500
 
 @bp.route('/reset-password', methods=['POST'])
 def reset_password():

@@ -3,7 +3,17 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
-import { Sun, Moon, User, LogOut, Music, Home, Menu, X } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  User,
+  LogOut,
+  Music,
+  Home,
+  Menu,
+  X,
+  Loader2,
+} from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -11,14 +21,21 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+    setLoggingOut(true);
+
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } finally {
+      setLoggingOut(false);
+    }
   };
 
   const isActive = (path) => location.pathname === path;
@@ -104,10 +121,17 @@ const Navbar = () => {
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 hover:scale-[1.03] shadow-lg cursor-pointer"
+                  disabled={loggingOut}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 hover:scale-[1.03] shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span className="hidden sm:inline font-medium">Logout</span>
+                  {loggingOut ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <LogOut className="w-5 h-5" />
+                  )}
+                  <span className="hidden sm:inline font-medium">
+                    {loggingOut ? "Logging out..." : "Logout"}
+                  </span>
                 </button>
               </>
             )}
@@ -189,10 +213,17 @@ const Navbar = () => {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 shadow-lg cursor-pointer"
+                    disabled={loggingOut}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-lg transition-all duration-300 shadow-lg cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium">Logout</span>
+                    {loggingOut ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <LogOut className="w-5 h-5" />
+                    )}
+                    <span className="font-medium">
+                      {loggingOut ? "Logging out..." : "Logout"}
+                    </span>
                   </button>
                 </>
               )}
@@ -200,6 +231,22 @@ const Navbar = () => {
           </div>
         )}
       </div>
+
+      {loggingOut && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 backdrop-blur-sm">
+          <div className="surface-card flex items-center gap-3 rounded-2xl px-6 py-4 shadow-2xl">
+            <Loader2 className="w-6 h-6 animate-spin text-cyan-600 dark:text-cyan-300" />
+            <div>
+              <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                Logging out
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Please wait a moment
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
