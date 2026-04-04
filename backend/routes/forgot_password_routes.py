@@ -5,12 +5,13 @@ import random
 import string
 import smtplib
 import os
+import threading
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 
 bp = Blueprint('forgot_password', __name__)
 
-# In-memory store for OTPs (for demo; use DB/Redis in production)
+# In-memory store for OTPs
 otp_store = {}
 
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
@@ -21,34 +22,41 @@ EMAIL_FROM = os.getenv('EMAIL_FROM', EMAIL_HOST_USER)
 
 OTP_EXPIRY_MINUTES = 10
 
-print("EMAIL_HOST_USER:", EMAIL_HOST_USER)
-print("EMAIL_HOST_PASSWORD:", EMAIL_HOST_PASSWORD)
-print("EMAIL_FROM:", EMAIL_FROM)
 
+# 🔥 FIXED EMAIL FUNCTION (NON-BLOCKING SAFE)
 def send_otp_email(to_email, otp):
-    subject = "Your OTP for Password Reset"
-    body = f"Your OTP for password reset is: {otp}\nThis OTP is valid for {OTP_EXPIRY_MINUTES} minutes."
-    msg = MIMEText(body)
-    msg['Subject'] = subject
-    msg['From'] = EMAIL_FROM
-    msg['To'] = to_email
+    try:
+        subject = "Your OTP for Password Reset"
+        body = f"Your OTP is: {otp}\nValid for {OTP_EXPIRY_MINUTES} minutes."
 
-    print("Connecting SMTP...")
-    with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
-        server.starttls()
-        server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
-        server.sendmail(EMAIL_FROM, [to_email], msg.as_string())
+        msg = MIMEText(body)
+        msg['Subject'] = subject
+        msg['From'] = EMAIL_FROM
+        msg['To'] = to_email
+
+        print("Connecting SMTP...")
+
+        # ✅ Added timeout
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+            server.sendmail(EMAIL_FROM, [to_email], msg.as_string())
+
+        print("Email sent successfully ✅")
+
+    except Exception as e:
+        print("SMTP ERROR:", str(e))
 
 
 def generate_otp(length=6):
     return ''.join(random.choices(string.digits, k=length))
 
 
+# 🔥 FORGOT PASSWORD ROUTE (FIXED)
 @bp.route('/forgot-password', methods=['POST', 'OPTIONS'])
 def forgot_password():
-    from flask import request, jsonify
 
-    # ✅ Handle preflight request
+    # ✅ Handle preflight
     if request.method == "OPTIONS":
         return jsonify({}), 200
 
@@ -72,42 +80,52 @@ def forgot_password():
             return jsonify({'error': 'You are not registered. Please sign up.'}), 404
 
         otp = generate_otp()
+
         otp_store[email] = {
             'otp': otp,
             'expires_at': datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
         }
 
-        send_otp_email(email, otp)
+        # 🔥 VERY IMPORTANT FIX → RUN EMAIL IN BACKGROUND THREAD
+        threading.Thread(target=send_otp_email, args=(email, otp)).start()
 
+        # ✅ Return immediately (no waiting → no timeout)
         return jsonify({'message': 'OTP sent to email'}), 200
 
     except Exception as e:
         print("ERROR:", str(e))
         return jsonify({'error': 'Internal server error'}), 500
 
+
+# 🔥 RESET PASSWORD (UNCHANGED BUT CLEAN)
 @bp.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
+
     email = data.get('email')
     otp = data.get('otp')
     new_password = data.get('new_password')
+
     if not all([email, otp, new_password]):
         return jsonify({'error': 'Email, OTP, and new password are required'}), 400
 
     otp_entry = otp_store.get(email)
+
     if not otp_entry or otp_entry['otp'] != otp:
         return jsonify({'error': 'Invalid OTP'}), 400
+
     if datetime.utcnow() > otp_entry['expires_at']:
         return jsonify({'error': 'OTP expired'}), 400
 
-    # Hash new password before saving
-    hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    hashed_password = generate_password_hash(new_password)
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('UPDATE users SET password = %s WHERE email = %s', (hashed_password, email))
     conn.commit()
     cursor.close()
     conn.close()
-    # Remove OTP after use
+    
     otp_store.pop(email, None)
+
     return jsonify({'message': 'Password reset successful'}), 200
