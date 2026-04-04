@@ -67,16 +67,16 @@ app.register_blueprint(forgot_password_routes.bp, url_prefix='/api')
 # ====================
 # CRITICAL: Handle OPTIONS requests (Preflight)
 # ====================
-# @app.before_request
-# def handle_preflight():
-#     from flask import request
-#     if request.method == "OPTIONS":
-#         response = app.make_default_options_response()
-#         response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
-#         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-#         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-#         response.headers['Access-Control-Allow-Credentials'] = 'true'
-#         return response
+@app.before_request
+def handle_preflight():
+    from flask import request
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
 
 # Error handlers
 @app.errorhandler(404)
