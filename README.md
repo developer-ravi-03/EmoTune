@@ -55,6 +55,18 @@ Emotion-aware music recommendation platform that detects facial emotion from web
   - Vercel (frontend hosting)
   - SendGrid (OTP/email notifications)
 
+## Screenshots
+
+![Register Page](image.png)
+
+![Home page](image-1.png)
+
+![Detected face](image-2.png)
+
+![Profile page](image-3.png)
+
+![Forgot password page](image-4.png)
+
 ## Project Structure
 
 ```text
