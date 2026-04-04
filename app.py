@@ -45,6 +45,7 @@ app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config['JWT_HEADER_NAME'] = 'Authorization'
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False  # Or set to a timedelta
+app.url_map.strict_slashes = False
 
 jwt = JWTManager(app)
 
