@@ -3,60 +3,50 @@ from backend.config.database import get_db_connection
 from werkzeug.security import generate_password_hash
 import random
 import string
-import smtplib
 import os
 import threading
-from email.mime.text import MIMEText
 from datetime import datetime, timedelta
+
+# ✅ SendGrid imports
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 bp = Blueprint('forgot_password', __name__)
 
-# In-memory store for OTPs
 otp_store = {}
 
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_FROM = os.getenv('EMAIL_FROM', EMAIL_HOST_USER)
+EMAIL_FROM = os.getenv('EMAIL_FROM')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 OTP_EXPIRY_MINUTES = 10
 
 
-# 🔥 FIXED EMAIL FUNCTION (NON-BLOCKING SAFE)
+# 🔥 NEW SENDGRID EMAIL FUNCTION
 def send_otp_email(to_email, otp):
     try:
-        subject = "Your OTP for Password Reset"
-        body = f"Your OTP is: {otp}\nValid for {OTP_EXPIRY_MINUTES} minutes."
+        message = Mail(
+            from_email=EMAIL_FROM,
+            to_emails=to_email,
+            subject="Your OTP for Password Reset",
+            plain_text_content=f"Your OTP is: {otp}\nValid for {OTP_EXPIRY_MINUTES} minutes."
+        )
 
-        msg = MIMEText(body)
-        msg['Subject'] = subject
-        msg['From'] = EMAIL_FROM
-        msg['To'] = to_email
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
 
-        print("Connecting SMTP...")
-
-        # ✅ Added timeout
-        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
-            server.sendmail(EMAIL_FROM, [to_email], msg.as_string())
-
-        print("Email sent successfully ✅")
+        print("Email sent via SendGrid:", response.status_code)
 
     except Exception as e:
-        print("SMTP ERROR:", str(e))
+        print("SendGrid ERROR:", str(e))
 
 
 def generate_otp(length=6):
     return ''.join(random.choices(string.digits, k=length))
 
 
-# 🔥 FORGOT PASSWORD ROUTE (FIXED)
 @bp.route('/forgot-password', methods=['POST', 'OPTIONS'])
 def forgot_password():
 
-    # ✅ Handle preflight
     if request.method == "OPTIONS":
         return jsonify({}), 200
 
@@ -68,7 +58,6 @@ def forgot_password():
 
         email = data.get('email')
 
-        # Check if user exists
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute('SELECT id FROM users WHERE email = %s', (email,))
@@ -86,10 +75,9 @@ def forgot_password():
             'expires_at': datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
         }
 
-        # 🔥 VERY IMPORTANT FIX → RUN EMAIL IN BACKGROUND THREAD
+        # 🔥 Send email in background
         threading.Thread(target=send_otp_email, args=(email, otp)).start()
 
-        # ✅ Return immediately (no waiting → no timeout)
         return jsonify({'message': 'OTP sent to email'}), 200
 
     except Exception as e:
@@ -97,7 +85,6 @@ def forgot_password():
         return jsonify({'error': 'Internal server error'}), 500
 
 
-# 🔥 RESET PASSWORD (UNCHANGED BUT CLEAN)
 @bp.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
@@ -125,7 +112,7 @@ def reset_password():
     conn.commit()
     cursor.close()
     conn.close()
-    
+
     otp_store.pop(email, None)
 
     return jsonify({'message': 'Password reset successful'}), 200

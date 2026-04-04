@@ -16,3 +16,6 @@ Your Flask → calls HuggingFace API → returns prediction
 
 4. Frontend deployed on vercel
 -->https://emo-tune-rose.vercel.app/
+
+5. upgrade SMTP to sendgrid for send email
+-->SRQL8KE5RT6SMLBTG8G2WZZ2
